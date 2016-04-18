@@ -19,26 +19,26 @@
 
 package org.rapidpm.hazelcast.hzdfs.directory.ops.create.directory;
 
-import com.hazelcast.nio.Address;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
+import org.rapidpm.hazelcast.hzdfs.base.model.fstree.DirectoryNode;
 import org.rapidpm.hazelcast.hzdfs.base.ops.HZDFSBaseOperation;
-import org.rapidpm.hazelcast.hzdfs.directory.HZDirectoryRemoteService;
-import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainer;
 import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainerValue;
+import org.rapidpm.hazelcast.hzdfs.directory.container.model.HZDirectoryDefaultImpl;
 
 import java.io.IOException;
 import java.util.Optional;
 
-public class CreateDirectoryOperation extends HZDFSBaseOperation {
+
+public class CreateRootDirectoryOperation extends HZDFSBaseOperation {
 
 
   private String input;
   private Optional<HZDirectory> returnValue;
 
-  public CreateDirectoryOperation(final String objectName, final String input) {
+  public CreateRootDirectoryOperation(final String objectName, final String input) {
     super(objectName);
     this.input = input;
   }
@@ -50,21 +50,18 @@ public class CreateDirectoryOperation extends HZDFSBaseOperation {
 
   @Override
   public void run() throws Exception {
-    final Address thisAddress = getNodeEngine().getThisAddress();
-    System.out.println("Executing "
-        + objectName + CreateDirectoryOperation.class.getSimpleName() + ".run( ) on: "
-        + thisAddress);
-
-    final HZDirectoryRemoteService hzDirectoryRemoteService = getService();
-    final int partitionId = getPartitionId();
-    final PartitionContainer partitionContainer = hzDirectoryRemoteService.getPartitionContainer(partitionId);
-    final Optional<PartitionContainerValue> containerValue = partitionContainer.getPartitionContainerValue(objectName);
-
+    final Optional<PartitionContainerValue> containerValue = getPartitionContainerValue();
     if (containerValue.isPresent()) {
       final PartitionContainerValue value = containerValue.get();
-      final Optional<HZDirectory> hzDirectory = value.addNewRootDirectory(input);
-      returnValue = hzDirectory;
-      partitionContainer.setPartitionContainerValue(objectName, value);
+      final Optional<DirectoryNode> hzDirectoryNode = value.addNewRootDirectory(input);
+      if (hzDirectoryNode.isPresent()) {
+        final DirectoryNode node = hzDirectoryNode.get();
+        final String nodeID = node.nodeID;
+        final HZDirectoryDefaultImpl dir = new HZDirectoryDefaultImpl(null, input);
+        dir.setNodeID(nodeID); // connect both...
+        returnValue = Optional.of(dir);
+      }
+//      partitionContainer.setPartitionContainerValue(objectName, value);
     }
   }
 

@@ -17,40 +17,35 @@
  * under the License.
  */
 
-package org.rapidpm.hazelcast.hzdfs.directory.container.model;
+package org.rapidpm.hazelcast.hzdfs.base.model.fstree;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializable;
-import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
 
 import java.io.IOException;
 
-public class HZDirectoryDefaultImpl extends HZDirectoryAbstractBaseImpl implements DataSerializable {
+public class FileNode extends Node implements DataSerializable {
 
 
-  public HZDirectoryDefaultImpl(final HZDirectory parent, final String name) {
-    super(parent, name);
-    // set me as child
-    if (parent != null) parent.addDirectory(this);
+  public FileNode() {
+    type = NodeType.FILE;
   }
 
-  public HZDirectoryDefaultImpl() {
-  }
 
   @Override
   public void writeData(final ObjectDataOutput out) throws IOException {
-    out.writeUTF(path());
-    out.writeUTF(name());
-    final HZDirectory parent = getParent();
-    if (parent instanceof HZDirectoryDefaultImpl) ((HZDirectoryDefaultImpl) parent).writeData(out);
+
+
   }
 
   @Override
   public void readData(final ObjectDataInput in) throws IOException {
-    this.path = in.readUTF();
-    this.name = in.readUTF();
-    this.parent = new HZDirectoryDefaultImpl();
-    ((HZDirectoryDefaultImpl) this.parent).readData(in);
+
+  }
+
+  @Override
+  public String toString() {
+    return "FileNode{}";
   }
 }

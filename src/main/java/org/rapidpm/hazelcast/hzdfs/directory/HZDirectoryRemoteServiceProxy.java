@@ -19,19 +19,23 @@
 
 package org.rapidpm.hazelcast.hzdfs.directory;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
 import org.rapidpm.hazelcast.hzdfs.base.api.HZFile;
-import org.rapidpm.hazelcast.hzdfs.directory.ops.create.directory.CreateDirectoryOperation;
+import org.rapidpm.hazelcast.hzdfs.directory.ops.create.directory.CreateRootDirectoryOperation;
 import org.rapidpm.hazelcast.hzdfs.directory.ops.list.directories.ListDirectoryOperation;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.Future;
+
+import static org.rapidpm.hazelcast.hzdfs.impl.HZDFSConstants.HZDFS_DIRECTORY_PREFIX;
 
 public class HZDirectoryRemoteServiceProxy
     extends AbstractDistributedObject<HZDirectoryRemoteService>
@@ -90,6 +94,13 @@ public class HZDirectoryRemoteServiceProxy
         .createInvocationBuilder(HZDirectoryRemoteService.NAME, operation, partitionId);
     try {
       final Future<Collection<HZDirectory>> future = builder.invoke();
+
+      // get the real object from HZ
+      final HazelcastInstance hz = getNodeEngine().getHazelcastInstance();
+      final IMap<Object, Object> iMap = hz.getMap("");
+//      iMap.get()
+
+
       return future.get();
     } catch (Exception e) {
       throw ExceptionUtil.rethrow(e);
@@ -107,7 +118,7 @@ public class HZDirectoryRemoteServiceProxy
 
     final NodeEngine nodeEngine = getNodeEngine();
     //TODO refactoring
-    final CreateDirectoryOperation operation = new CreateDirectoryOperation(objectName, newDirectory.name());
+    final CreateRootDirectoryOperation operation = new CreateRootDirectoryOperation(objectName, newDirectory.name());
     final int partitionId = nodeEngine
         .getPartitionService()
         .getPartitionId(objectName);
@@ -118,7 +129,11 @@ public class HZDirectoryRemoteServiceProxy
       final Future<Optional<HZDirectory>> future = builder.invoke();
       final Optional<HZDirectory> hzDirectory = future.get();
       System.out.println("hzDirectory = " + hzDirectory);
-//      return future.get();
+      if (hzDirectory.isPresent()) {
+        final HZDirectory dir = hzDirectory.get();
+        final IMap<String, HZDirectory> hzDirectoryIMap = getNodeEngine().getHazelcastInstance().getMap(HZDFS_DIRECTORY_PREFIX + objectName);
+        hzDirectoryIMap.put(dir.absolutePath(), dir);
+      }
     } catch (Exception e) {
       throw ExceptionUtil.rethrow(e);
     }

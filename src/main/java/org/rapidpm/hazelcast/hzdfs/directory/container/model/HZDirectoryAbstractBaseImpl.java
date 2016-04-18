@@ -33,10 +33,10 @@ import static org.rapidpm.hazelcast.hzdfs.impl.HZDFSConstants.*;
 
 abstract class HZDirectoryAbstractBaseImpl extends HZFSAbstractNode implements HZDirectory {
 
-  private final HZDirectory parent;
-  private final String path;
-  private final String name;
   private final HazelcastInstance hz = new HZInstanceBuilder().createHZInstance();
+  protected HZDirectory parent;
+  protected String path;
+  protected String name;
   //absolute directorypath
   private final Map<String, HZDirectory> directories = hz.getMap(HZDFS_DIRLIST_PREFIX + absolutePath());
   private final Map<String, HZFile> files = hz.getMap(HZDFS_FILE_PREFIX + absolutePath());
@@ -46,7 +46,9 @@ abstract class HZDirectoryAbstractBaseImpl extends HZFSAbstractNode implements H
     this.parent = parent;
     this.path = (parent != null) ? parent.absolutePath() : "/";
     this.name = name;
+  }
 
+  public HZDirectoryAbstractBaseImpl() {
   }
 
   public HZDirectory getParent() {

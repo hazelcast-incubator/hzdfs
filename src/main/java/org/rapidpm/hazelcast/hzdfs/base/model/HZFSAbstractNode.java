@@ -21,15 +21,17 @@ package org.rapidpm.hazelcast.hzdfs.base.model;
 
 import org.rapidpm.hazelcast.hzdfs.base.api.HZFSNode;
 
-import java.util.UUID;
-
 public abstract class HZFSAbstractNode implements HZFSNode {
 
-  private final String nodeID = UUID.randomUUID().toString();
+  private String nodeID;
   private boolean readOnly;
   private boolean persistent;
   private int groupID;
   private int userID;
+
+  public void setNodeID(final String nodeID) {
+    this.nodeID = nodeID;
+  }
 
   public boolean isReadOnly() {
     return readOnly;

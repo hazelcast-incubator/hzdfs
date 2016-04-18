@@ -19,20 +19,21 @@
 
 package org.rapidpm.hazelcast.hzdfs.directory.ops.list.directories;
 
-import com.hazelcast.nio.Address;
+import com.hazelcast.core.IMap;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
+import org.rapidpm.hazelcast.hzdfs.base.model.fstree.DirectoryNode;
 import org.rapidpm.hazelcast.hzdfs.base.ops.HZDFSBaseOperation;
-import org.rapidpm.hazelcast.hzdfs.directory.HZDirectoryRemoteService;
-import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainer;
 import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainerValue;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+
+import static org.rapidpm.hazelcast.hzdfs.impl.HZDFSConstants.HZDFS_DIRECTORY_PREFIX;
 
 public class ListDirectoryOperation extends HZDFSBaseOperation {
 
@@ -50,20 +51,14 @@ public class ListDirectoryOperation extends HZDFSBaseOperation {
 
   @Override
   public void run() throws Exception {
-    final Address thisAddress = getNodeEngine().getThisAddress();
-    System.out.println("Executing "
-        + objectName + ListDirectoryOperation.class.getSimpleName() + ".run( ) on: "
-        + thisAddress);
-
-    final HZDirectoryRemoteService hzDirectoryRemoteService = getService();
-    final int partitionId = getPartitionId();
-    final PartitionContainer partitionContainer = hzDirectoryRemoteService.getPartitionContainer(partitionId);
-    final Optional<PartitionContainerValue> containerValue = partitionContainer.getPartitionContainerValue(objectName);
+    final Optional<PartitionContainerValue> containerValue = getPartitionContainerValue();
     if (containerValue.isPresent()) {
       final PartitionContainerValue value = containerValue.get();
       //absoluteParentPath is the directory name
-      final Collection<HZDirectory> allDirectories = value.getAllDirectories();
-      returnValue = allDirectories;
+      final Collection<DirectoryNode> allRootDirectories = value.getAllRootDirectories();
+      System.out.println("allRootDirectories = " + allRootDirectories);
+      final IMap<String, HZDirectory> hzDirectoryIMap = getNodeEngine().getHazelcastInstance().getMap(HZDFS_DIRECTORY_PREFIX + objectName);
+      returnValue = hzDirectoryIMap.values();
       // no change
       //partitionContainer.setPartitionContainerValue(objectName, value);
     }

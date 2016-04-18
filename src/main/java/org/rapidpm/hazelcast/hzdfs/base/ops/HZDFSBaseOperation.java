@@ -19,12 +19,21 @@
 
 package org.rapidpm.hazelcast.hzdfs.base.ops;
 
+import com.hazelcast.logging.ILogger;
+import com.hazelcast.logging.Logger;
+import com.hazelcast.nio.Address;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.AbstractOperation;
 import com.hazelcast.spi.BackupAwareOperation;
+import com.hazelcast.spi.NodeEngine;
+import org.rapidpm.hazelcast.hzdfs.directory.HZDirectoryRemoteService;
+import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainer;
+import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainerValue;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.logging.Level;
 
 public abstract class HZDFSBaseOperation
     extends AbstractOperation
@@ -38,6 +47,21 @@ public abstract class HZDFSBaseOperation
 
   public HZDFSBaseOperation(final String objectName) {
     this.objectName = objectName;
+  }
+
+
+  protected Optional<PartitionContainerValue> getPartitionContainerValue() {
+    final NodeEngine nodeEngine = getNodeEngine();
+    final ILogger logger = Logger.getLogger(this.getClass());
+    final Address thisAddress = nodeEngine.getThisAddress();
+    logger.log(Level.INFO, "Executing "
+        + objectName + this.getClass().getSimpleName() + ".run( ) on: "
+        + thisAddress);
+
+    final HZDirectoryRemoteService hzDirectoryRemoteService = getService();
+    final int partitionId = getPartitionId();
+    final PartitionContainer partitionContainer = hzDirectoryRemoteService.getPartitionContainer(partitionId);
+    return partitionContainer.getPartitionContainerValue(objectName);
   }
 
   @Override
