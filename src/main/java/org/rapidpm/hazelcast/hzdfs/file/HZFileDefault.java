@@ -19,59 +19,19 @@
 
 package org.rapidpm.hazelcast.hzdfs.file;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
-import org.rapidpm.hazelcast.hzdfs.file.api.HZFile;
+import org.rapidpm.hazelcast.hzdfs.base.api.HZFile;
+import org.rapidpm.hazelcast.hzdfs.base.model.HZFSAbstractNode;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+public class HZFileDefault extends HZFSAbstractNode implements HZFile {
 
-public class HZFileDefault implements HZFile {
-
-  private String uuid;
   private ILock lock;
-
-  private int userID;
-  private int groupID;
-
-  private boolean isReadonly;
-  private boolean isPersistent;
-
+  private HazelcastInstance hz;
   private byte[] data;
 
   public HZFileDefault() {
   }
-
-  private HZFileDefault(final Builder builder) {
-    data = builder.data;
-    uuid = builder.uuid;
-    lock = builder.lock;
-    userID = builder.userID;
-    groupID = builder.groupID;
-    isReadonly = builder.isReadonly;
-    isPersistent = builder.isPersistent;
-  }
-
-  public static Builder newBuilder() {
-    return new Builder();
-  }
-
-  public static Builder newBuilder(@Nonnull final HZFileDefault copy) {
-    Builder builder = new Builder();
-    builder.data = copy.data;
-    builder.uuid = copy.uuid;
-    builder.lock = copy.lock;
-    builder.userID = copy.userID;
-    builder.groupID = copy.groupID;
-    builder.isReadonly = copy.isReadonly;
-    builder.isPersistent = copy.isPersistent;
-    return builder;
-  }
-
 
   @Override
   public void writeFileData(final byte[] fileData) {
@@ -83,10 +43,7 @@ public class HZFileDefault implements HZFile {
     return data;
   }
 
-  @Override
-  public String nodeID() {
-    return uuid;
-  }
+
 
   @Override
   public void delete() {
@@ -98,25 +55,6 @@ public class HZFileDefault implements HZFile {
     //
   }
 
-  @Override
-  public boolean isReadonly() {
-    return isReadonly;
-  }
-
-  @Override
-  public boolean isWritable() {
-    return !isReadonly;
-  }
-
-  @Override
-  public int groupID() {
-    return groupID;
-  }
-
-  @Override
-  public int userID() {
-    return userID;
-  }
 
   @Override
   public void lock() {
@@ -130,159 +68,35 @@ public class HZFileDefault implements HZFile {
 
   @Override
   public void persist() {
-    this.isPersistent = true;
+
   }
 
   @Override
   public void unPersist() {
-    this.isPersistent = false;
+
   }
 
-  @Override
-  public boolean isPersistent() {
-    return isPersistent;
-  }
-
-  @Override
-  public boolean isTransient() {
-    return !isPersistent;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(uuid, userID, groupID, data);
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (!(o instanceof HZFileDefault)) return false;
-    final HZFileDefault that = (HZFileDefault) o;
-    return userID == that.userID &&
-        groupID == that.groupID &&
-        Objects.equals(uuid, that.uuid) &&
-        Arrays.equals(data, that.data);
-  }
-
-  @Override
-  public String toString() {
-    return "HZFileDefault{" +
-        "data=" + Arrays.toString(data) +
-        ", groupID=" + groupID +
-        ", isPersistent=" + isPersistent +
-        ", isReadonly=" + isReadonly +
-        ", lock=" + lock +
-        ", userID=" + userID +
-        ", uuid=" + uuid +
-        '}';
-  }
 
   //@Override
-  public void writeData(final ObjectDataOutput out) throws IOException {
-    out.writeUTF(this.uuid);
-    out.writeBoolean(this.isPersistent);
-    out.writeBoolean(this.isReadonly);
-    out.writeInt(this.userID);
-    out.writeInt(this.groupID);
-    out.writeByteArray(data);
-  }
-
-  //@Override
-  public void readData(final ObjectDataInput in) throws IOException {
-    this.uuid = in.readUTF();
-    this.isPersistent = in.readBoolean();
-    this.isReadonly = in.readBoolean();
-    this.userID = in.readInt();
-    this.groupID = in.readInt();
-    this.data = in.readByteArray();
-  }
-
-  @Override
-  public String getPartitionKey() {
-    return null;
-  }
-
-  @Override
-  public String getName() {
-    return null;
-  }
-
-  @Override
-  public String getServiceName() {
-    return null;
-  }
-
-  @Override
-  public void destroy() {
-
-  }
-
-  public static final class Builder {
-    private byte[] data;
-    private String uuid;
-    private ILock lock;
-    private int userID;
-    private int groupID;
-    private boolean isReadonly;
-    private boolean isPersistent;
-
-    private Builder() {
-    }
-
-    @Nonnull
-    public Builder withData(@Nonnull final byte[] data) {
-      this.data = data;
-      return this;
-    }
-
-    @Nonnull
-    public Builder withUuid(@Nonnull final String uuid) {
-      this.uuid = uuid;
-      return this;
-    }
-
-    @Nonnull
-    public Builder withNewUuid() {
-      this.uuid = UUID.randomUUID().toString();
-      return this;
-    }
+//  public void writeData(final ObjectDataOutput out) throws IOException {
+//    out.writeUTF(this.uuid);
+//    out.writeBoolean(this.isPersistent);
+//    out.writeBoolean(this.isReadonly);
+//    out.writeInt(this.userID);
+//    out.writeInt(this.groupID);
+//    out.writeByteArray(data);
+//  }
+//
+//  //@Override
+//  public void readData(final ObjectDataInput in) throws IOException {
+//    this.uuid = in.readUTF();
+//    this.isPersistent = in.readBoolean();
+//    this.isReadonly = in.readBoolean();
+//    this.userID = in.readInt();
+//    this.groupID = in.readInt();
+//    this.data = in.readByteArray();
+//  }
 
 
-    @Nonnull
-    public Builder withLock(@Nonnull final ILock lock) {
-      this.lock = lock;
-      return this;
-    }
 
-    @Nonnull
-    public Builder withUserID(final int userID) {
-      this.userID = userID;
-      return this;
-    }
-
-    @Nonnull
-    public Builder withGroupID(final int groupID) {
-      this.groupID = groupID;
-      return this;
-    }
-
-    @Nonnull
-    public Builder withIsReadonly(final boolean isReadonly) {
-      this.isReadonly = isReadonly;
-      return this;
-    }
-
-    @Nonnull
-    public Builder withIsPersistent(final boolean isPersistent) {
-      this.isPersistent = isPersistent;
-      return this;
-    }
-
-    @Nonnull
-    public HZFileDefault build() {
-
-
-      return new HZFileDefault(this);
-    }
-  }
 }

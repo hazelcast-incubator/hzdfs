@@ -20,8 +20,6 @@
 package org.rapidpm.hazelcast.hzdfs.base.api;
 
 import com.hazelcast.spi.ManagedService;
-import org.rapidpm.hazelcast.hzdfs.directory.api.HZDirectory;
-import org.rapidpm.hazelcast.hzdfs.file.api.HZFile;
 
 import java.util.Optional;
 
@@ -42,7 +40,6 @@ public interface HZDFS extends ManagedService {
   int getGroudID(String groupName);
 
   int getUserID(String userName);
-
 
   Optional<HZDirectory> getRootDirectory(String rootName);
 }

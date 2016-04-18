@@ -50,23 +50,22 @@ public class PartitionContainerMigrationOperation extends AbstractOperation {
 
 
   @Override
-  protected void writeInternal(ObjectDataOutput out) throws IOException {
+  protected void writeInternal(final ObjectDataOutput out) throws IOException {
 
     out.writeInt(migrationData.size());
     for (final Entry<String, PartitionContainerValue> entry : migrationData.entrySet()) {
       out.writeUTF(entry.getKey());
       entry.getValue().writeData(out);
-//      out.writeUTF(entry.getValue()); // TODO how to write ?
     }
   }
 
   @Override
-  protected void readInternal(ObjectDataInput in) throws IOException {
+  protected void readInternal(final ObjectDataInput in) throws IOException {
     int size = in.readInt();
     migrationData = new HashMap<>();
     for (int i = 0; i < size; i++) {
       final String key = in.readUTF();
-      final PartitionContainerValue partitionContainerValue = new PartitionContainerValue();
+      final PartitionContainerValue partitionContainerValue = new PartitionContainerValue(key);
       partitionContainerValue.readData(in);
       migrationData.put(key, partitionContainerValue);
     }

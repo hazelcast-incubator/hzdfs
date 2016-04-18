@@ -19,8 +19,6 @@
 
 package org.rapidpm.hazelcast.hzdfs.impl.fs;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.rapidpm.hazelcast.hzdfs.base.api.HZDFS;
 import org.rapidpm.hazelcast.hzdfs.impl.HZDFSConstants;
@@ -33,6 +31,7 @@ public class HZDFSBuilder {
   private HZDFSBuilder(String name) {
     this.hzdfsName = name;
   }
+
 
   public static HZDFSBuilder newBuilder(final String hzdfsName) {
     if (hzdfsName == null) {
@@ -48,12 +47,9 @@ public class HZDFSBuilder {
 
   public HZDFS build() {
 
-    final Config config = new Config()
-        .setInstanceName(hzdfsName);
-    final HazelcastInstance hazelcastInstance = Hazelcast.getOrCreateHazelcastInstance(config);
+    final HazelcastInstance hzInstance = new HZInstanceBuilder().createHZInstance(hzdfsName);
 
-
-    final HZDFSDefault hzdfsDefault = new HZDFSDefault(hzdfsName, hazelcastInstance);
+    final HZDFSDefault hzdfsDefault = new HZDFSDefault(hzdfsName, hzInstance);
 
     return hzdfsDefault;
   }

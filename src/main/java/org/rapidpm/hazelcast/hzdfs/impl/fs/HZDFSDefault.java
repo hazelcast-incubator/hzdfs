@@ -22,12 +22,16 @@ package org.rapidpm.hazelcast.hzdfs.impl.fs;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spi.NodeEngine;
 import org.rapidpm.hazelcast.hzdfs.base.api.HZDFS;
-import org.rapidpm.hazelcast.hzdfs.directory.api.HZDirectory;
-import org.rapidpm.hazelcast.hzdfs.file.api.HZFile;
+import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
+import org.rapidpm.hazelcast.hzdfs.base.api.HZFile;
+import org.rapidpm.hazelcast.hzdfs.directory.HZDirectoryRemoteServiceProxy;
 import org.rapidpm.hazelcast.hzdfs.impl.HZDFSConstants;
 
 import java.util.Optional;
 import java.util.Properties;
+
+import static org.rapidpm.hazelcast.hzdfs.directory.HZDirectoryRemoteService.NAME;
+import static org.rapidpm.hazelcast.hzdfs.impl.HZDFSConstants.HZDFS_DISTRIBUTED_OBJECT_PREFIX;
 
 public class HZDFSDefault implements HZDFS {
 
@@ -77,9 +81,9 @@ public class HZDFSDefault implements HZDFS {
 
   @Override
   public Optional<HZDirectory> getRootDirectory(final String rootName) {
-//    hz.getDistributedObject()
-    return Optional.ofNullable(null);
-
+    //create a dir instance with the rootName
+    final HZDirectoryRemoteServiceProxy proxy = hz.getDistributedObject(NAME, HZDFS_DISTRIBUTED_OBJECT_PREFIX + rootName);
+    return Optional.ofNullable(proxy);
   }
 
   @Override

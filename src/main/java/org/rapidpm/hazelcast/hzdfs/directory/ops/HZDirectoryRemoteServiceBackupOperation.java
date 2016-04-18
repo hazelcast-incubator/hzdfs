@@ -39,9 +39,12 @@ public class HZDirectoryRemoteServiceBackupOperation extends AbstractOperation i
   public HZDirectoryRemoteServiceBackupOperation(final String objectName, final String input) {
     this.objectName = objectName;
     this.input = input;
+    System.out.println("HZDirectoryRemoteServiceBackupOperation - objectName = " + objectName + " -  input " + input);
   }
 
   public HZDirectoryRemoteServiceBackupOperation() {
+    System.out.println("HZDirectoryRemoteServiceBackupOperation - objectName = " + objectName + " -  input " + input);
+
   }
 
   @Override

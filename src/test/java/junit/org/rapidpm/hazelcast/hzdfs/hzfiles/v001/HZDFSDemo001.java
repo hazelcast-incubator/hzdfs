@@ -21,23 +21,19 @@ package junit.org.rapidpm.hazelcast.hzdfs.hzfiles.v001;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.rapidpm.hazelcast.hzdfs.file.HZFileDefault;
-import org.rapidpm.hazelcast.hzdfs.file.api.HZFile;
+import org.rapidpm.hazelcast.hzdfs.base.api.HZFile;
 
 import java.util.Random;
-import java.util.UUID;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
@@ -61,37 +57,37 @@ public class HZDFSDemo001 extends HazelcastTestSupport {
   @Test
   @Ignore
   public void hzdfsTest001() throws Exception {
-    final HazelcastInstance hazelcastInstance = getInstance();
-
-    final UUID uuid = UUID.randomUUID();
-    final HZFile hzFileDefault = HZFileDefault.newBuilder()
-        .withUuid(uuid.toString())
-        .withGroupID(-1)
-        .withUserID(-1)
-        .withIsReadonly(false)
-        .withIsPersistent(false)
-//        .withLock(hazelcastInstance.getLock(uuid.toString()))
-        .build();
-
-    hzFileDefault.writeFileData("HelloWorld".getBytes());
-    final IMap<String, HZFile> hzFileMap = hazelcastInstance.getMap(HZ_FILE_MAP);
-    hzFileMap.put(hzFileDefault.nodeID(), hzFileDefault);
-
-    final HZFile file = getHzFile(uuid.toString());
-    Assert.assertEquals(hzFileDefault, file);
-    Assert.assertEquals(new String(hzFileDefault.readFileData()), new String(file.readFileData()));
-
-    hzFileDefault.writeFileData("HelloWorld - Again".getBytes());
-    hzFileMap.put(hzFileDefault.nodeID(), hzFileDefault);
-
-    Assert.assertEquals(new String(hzFileDefault.readFileData()), new String(getHzFile(uuid.toString()).readFileData()));
-  }
-
-  HazelcastInstance getInstance() {
-    return instances[rand.nextInt(instanceCount)];
+//    final HazelcastInstance hazelcastInstance = getInstance();
+//
+//    final UUID uuid = UUID.randomUUID();
+//    final HZFile hzFileDefault = HZFileDefault.newBuilder()
+//        .withUuid(uuid.toString())
+//        .withGroupID(-1)
+//        .withUserID(-1)
+//        .withIsReadonly(false)
+//        .withIsPersistent(false)
+////        .withLock(hazelcastInstance.getLock(uuid.toString()))
+//        .build();
+//
+//    hzFileDefault.writeFileData("HelloWorld".getBytes());
+//    final IMap<String, HZFile> hzFileMap = hazelcastInstance.getMap(HZ_FILE_MAP);
+//    hzFileMap.put(hzFileDefault.nodeID(), hzFileDefault);
+//
+//    final HZFile file = getHzFile(uuid.toString());
+//    Assert.assertEquals(hzFileDefault, file);
+//    Assert.assertEquals(new String(hzFileDefault.readFileData()), new String(file.readFileData()));
+//
+//    hzFileDefault.writeFileData("HelloWorld - Again".getBytes());
+//    hzFileMap.put(hzFileDefault.nodeID(), hzFileDefault);
+//
+//    Assert.assertEquals(new String(hzFileDefault.readFileData()), new String(getHzFile(uuid.toString()).readFileData()));
   }
 
   private HZFile getHzFile(final String nodeID) {
     return (HZFile) getInstance().getMap(HZ_FILE_MAP).get(nodeID);
+  }
+
+  HazelcastInstance getInstance() {
+    return instances[rand.nextInt(instanceCount)];
   }
 }

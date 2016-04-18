@@ -19,13 +19,26 @@
 
 package org.rapidpm.hazelcast.hzdfs.base.ops;
 
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.AbstractOperation;
 import com.hazelcast.spi.BackupAwareOperation;
+
+import java.io.IOException;
 
 public abstract class HZDFSBaseOperation
     extends AbstractOperation
     implements BackupAwareOperation {
 
+
+  protected String objectName;
+
+  public HZDFSBaseOperation() {
+  }
+
+  public HZDFSBaseOperation(final String objectName) {
+    this.objectName = objectName;
+  }
 
   @Override
   public boolean shouldBackup() {
@@ -42,9 +55,17 @@ public abstract class HZDFSBaseOperation
     return 0;
   }
 
+  @Override
+  protected void writeInternal(final ObjectDataOutput out) throws IOException {
+    super.writeInternal(out);
+    out.writeUTF(objectName);
+  }
 
   @Override
-  public void run() throws Exception {
-
+  protected void readInternal(final ObjectDataInput in) throws IOException {
+    super.readInternal(in);
+    objectName = in.readUTF();
   }
+
+
 }

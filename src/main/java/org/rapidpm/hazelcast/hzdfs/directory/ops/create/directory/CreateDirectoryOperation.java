@@ -17,12 +17,13 @@
  * under the License.
  */
 
-package org.rapidpm.hazelcast.hzdfs.directory.ops;
+package org.rapidpm.hazelcast.hzdfs.directory.ops.create.directory;
 
 import com.hazelcast.nio.Address;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
+import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
 import org.rapidpm.hazelcast.hzdfs.base.ops.HZDFSBaseOperation;
 import org.rapidpm.hazelcast.hzdfs.directory.HZDirectoryRemoteService;
 import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainer;
@@ -31,20 +32,40 @@ import org.rapidpm.hazelcast.hzdfs.directory.container.PartitionContainerValue;
 import java.io.IOException;
 import java.util.Optional;
 
-public class HZDirectoryRemoteServiceOperation extends HZDFSBaseOperation {
+public class CreateDirectoryOperation extends HZDFSBaseOperation {
 
-  private String objectName;
+
   private String input;
-  private String returnValue;
+  private Optional<HZDirectory> returnValue;
 
-  public HZDirectoryRemoteServiceOperation() {
-    System.out.println("HZDirectoryRemoteServiceOperation - objectName = " + objectName + " -  input " + input);
+  public CreateDirectoryOperation(final String objectName, final String input) {
+    super(objectName);
+    this.input = input;
   }
 
-  public HZDirectoryRemoteServiceOperation(final String objectName, final String input) {
-    this.input = input;
-    this.objectName = objectName;
-    System.out.println("HZDirectoryRemoteServiceOperation - objectName = " + objectName + " -  input " + input);
+  @Override
+  public Operation getBackupOperation() {
+    return null;
+  }
+
+  @Override
+  public void run() throws Exception {
+    final Address thisAddress = getNodeEngine().getThisAddress();
+    System.out.println("Executing "
+        + objectName + CreateDirectoryOperation.class.getSimpleName() + ".run( ) on: "
+        + thisAddress);
+
+    final HZDirectoryRemoteService hzDirectoryRemoteService = getService();
+    final int partitionId = getPartitionId();
+    final PartitionContainer partitionContainer = hzDirectoryRemoteService.getPartitionContainer(partitionId);
+    final Optional<PartitionContainerValue> containerValue = partitionContainer.getPartitionContainerValue(objectName);
+
+    if (containerValue.isPresent()) {
+      final PartitionContainerValue value = containerValue.get();
+      final Optional<HZDirectory> hzDirectory = value.addNewRootDirectory(input);
+      returnValue = hzDirectory;
+      partitionContainer.setPartitionContainerValue(objectName, value);
+    }
   }
 
   @Override
@@ -52,44 +73,22 @@ public class HZDirectoryRemoteServiceOperation extends HZDFSBaseOperation {
     return true;
   }
 
-  @Override // from AbstractOperation -- why not with generics?
-  public String getResponse() {
+  @Override
+  public Optional<HZDirectory> getResponse() {
     return returnValue;
   }
 
   @Override
   protected void writeInternal(final ObjectDataOutput out) throws IOException {
     super.writeInternal(out);
-    out.writeUTF(objectName);
     out.writeUTF(input);
   }
 
   @Override
   protected void readInternal(final ObjectDataInput in) throws IOException {
     super.readInternal(in);
-    objectName = in.readUTF();
     input = in.readUTF();
   }
 
-  @Override
-  public void run() throws Exception {
-    final Address thisAddress = getNodeEngine().getThisAddress();
-    System.out.println("Executing "
-        + objectName + ".doWork( input = " + input + ") on: "
-        + thisAddress);
 
-    final HZDirectoryRemoteService businessService = getService();
-    final int partitionId = getPartitionId();
-    final PartitionContainer partitionContainer = businessService.getPartitionContainer(partitionId);
-    final Optional<PartitionContainerValue> partitionContainerValue = partitionContainer.getPartitionContainerValue(objectName);
-//    final String nextValue = lastValueFor + " - " + input + thisAddress.getPort();
-//    returnValue = nextValue;
-//    partitionContainer.setlastValueFor(objectName, nextValue);
-  }
-
-  //BackupAwareOperation
-  @Override
-  public Operation getBackupOperation() {
-    return new HZDirectoryRemoteServiceBackupOperation(objectName, input);
-  }
 }

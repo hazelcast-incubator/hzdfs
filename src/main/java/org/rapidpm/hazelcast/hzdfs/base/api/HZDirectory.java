@@ -17,19 +17,24 @@
  * under the License.
  */
 
-package org.rapidpm.hazelcast.hzdfs.model;
+package org.rapidpm.hazelcast.hzdfs.base.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-public class Node {
+public interface HZDirectory extends HZFSNode {
 
-  private final List<Node> childs = new ArrayList<>();
+  String name();
 
-  private String nodeName;
-  private Rights rightsAll;
-  private Rights rightsGroup;
-  private Rights rightsUser;
+  String path();
+
+  String absolutePath();
+
+  Collection<HZFile> listFiles();
+
+  Collection<HZDirectory> listDirectories();
+
+  Collection<HZDirectory> listDirectories(String startPath);
 
 
+  void addDirectory(HZDirectory newDirectory);
 }

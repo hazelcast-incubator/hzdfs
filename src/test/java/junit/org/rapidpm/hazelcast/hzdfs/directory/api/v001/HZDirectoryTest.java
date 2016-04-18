@@ -17,18 +17,17 @@
  * under the License.
  */
 
-package org.rapidpm.hazelcast.hzdfs.directory.api;
+package junit.org.rapidpm.hazelcast.hzdfs.directory.api.v001;
 
-import org.rapidpm.hazelcast.hzdfs.base.api.HZFSNode;
-import org.rapidpm.hazelcast.hzdfs.file.api.HZFile;
+import org.junit.Test;
 
-import java.util.Collection;
+public class HZDirectoryTest {
 
-public interface HZDirectory extends HZFSNode {
+  @Test
+  public void test001() throws Exception {
 
-  Collection<HZFile> listFiles();
-
-  Collection<HZDirectory> listDirectories();
+//    Hazelcast.getOrCreateHazelcastInstance();
 
 
+  }
 }

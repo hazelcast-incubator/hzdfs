@@ -17,10 +17,8 @@
  * under the License.
  */
 
-package org.rapidpm.hazelcast.hzdfs.file.api;
+package org.rapidpm.hazelcast.hzdfs.base.api;
 
-
-import org.rapidpm.hazelcast.hzdfs.base.api.HZFSNode;
 
 public interface HZFile extends HZFSNode {
 

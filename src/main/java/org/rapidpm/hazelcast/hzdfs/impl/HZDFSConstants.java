@@ -21,10 +21,20 @@ package org.rapidpm.hazelcast.hzdfs.impl;
 
 public interface HZDFSConstants {
 
+  String HZDFS_DISTRIBUTED_OBJECT_PREFIX = "HZDFS-RootDirectory-";
+  String HZDFS_DIRECTORY_PREFIX = "HZDFS-Directory-";
+  String HZDFS_FILE_PREFIX = "HZDFS-File-";
+  String HZDFS_FILE_RAW_PREFIX = "HZDFS-FileRAW-";
+
+  String HZDFS_DIRLIST_PREFIX = "HZDFS-DIRLIST-";
+  String HZDFS_FILELIST_PREFIX = "HZDFS-FILELIST-";
+
+
+
   String HZDFS_GRP_MAP = "hzdfs-grp-map";
   String HZDFS_USR_MAP = "hzdfs-usr-map";
   String HZDFS_DEFAULT_FS = "hzdfs-default-fs";
-  String HZDFS_ROOT_NODE = "hzdfs-root-node";
+  //String HZDFS_ROOT_NODE = "hzdfs-root-node";
 
 
 }

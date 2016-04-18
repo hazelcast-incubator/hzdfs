@@ -19,9 +19,7 @@
 
 package org.rapidpm.hazelcast.hzdfs.base.api;
 
-import com.hazelcast.core.DistributedObject;
-
-public interface HZFSNode extends DistributedObject {
+public interface HZFSNode {
 
   String nodeID();
 

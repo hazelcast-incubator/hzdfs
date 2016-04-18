@@ -17,22 +17,20 @@
  * under the License.
  */
 
-package org.rapidpm.hazelcast.hzdfs.directory;
+package org.rapidpm.hazelcast.hzdfs.directory.container.model;
 
-import com.hazelcast.core.DistributedObject;
-import com.hazelcast.spi.NodeEngine;
-import org.rapidpm.hazelcast.hzdfs.base.HZDFSBaseRemoteService;
+import org.rapidpm.hazelcast.hzdfs.base.api.HZDirectory;
 
-public class HZDirectoryRemoteService extends HZDFSBaseRemoteService {
+public class HZDirectoryRootImpl extends HZDirectoryAbstractBaseImpl {
 
 
-  public static final String NAME = "hz:hzdfs:DirectoryRemoteService";
-
-
-
-  @Override
-  protected DistributedObject createProxy(final NodeEngine nodeEngine, final String objectName) {
-    return new HZDirectoryRemoteServiceProxy(nodeEngine, this, objectName);
+  private HZDirectoryRootImpl(final HZDirectory parent, final String name) {
+    super(parent, name);
   }
+
+  public HZDirectoryRootImpl(final String name) {
+    super(null, name);
+  }
+
 
 }

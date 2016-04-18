@@ -31,10 +31,13 @@ public class PartitionContainer {
 
   //every identity will have an entry
 
+  // Root-Directories inside a HZDFS -> Directory Values
   private final Map<String, PartitionContainerValue> object2ValueMap = new HashMap<>();
 
 
+  // ObjectName  == Name of the Root-Directory f.e. HZDFS-RootDirectory-name
   public void init(String objectName) {
+    object2ValueMap.put(objectName, new PartitionContainerValue(objectName));
   }
 
   public void destroy(String objectName) {
